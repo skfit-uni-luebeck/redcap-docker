@@ -1,0 +1,68 @@
+services:
+  php:
+    build: ./services/php/
+    container_name: redcap-php
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: redcap
+      DATABASE_DATABASE: redcap
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-redcap123}
+      DATABASE_SALT: ${DATABASE_SALT:-}e35399f8f5499516c4ae52dbcc473969c929754b65a30a75db547ec676f9fbcab8345396d6ba701d5cdf2421858be3bb99e9}
+    volumes:
+      - ./redcap/:/var/www/html/:z
+      - ./email.ini:/usr/local/etc/php/conf.d/email.ini:z
+      - ./edocs:/var/www/edocs:z
+    depends_on:
+      - db
+
+  cron:
+    build: ./services/php/
+    container_name: redcap-cron
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: redcap
+      DATABASE_DATABASE: redcap
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-redcap123}
+      DATABASE_SALT: ${DATABASE_SALT:-e35399f8f5499516c4ae52dbcc473969c929754b65a30a75db547ec676f9fbcab8345396d6ba701d5cdf2421858be3bb99e9}
+    volumes:
+      - ./redcap/:/var/www/html/:z
+      - ./email.ini:/usr/local/etc/php/conf.d/email.ini:z
+      - ./edocs:/var/www/edocs:z
+    depends_on:
+      - php
+    command:
+      - "crond"
+      - "-f"
+
+  nginx:
+    build: ./services/nginx
+    container_name: redcap-nginx
+    ports:
+      - ${HTTP_PORT:-8080}:80
+    volumes:
+      - ./redcap/:/var/www/html/:z
+    depends_on:
+      - php
+
+  db:
+    image: docker.io/mariadb:11.5.2
+    container_name: redcap-mysql
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: 1
+      MARIADB_USER: redcap
+      MARIADB_PASSWORD: ${DATABASE_PASSWORD:-redcap123}
+      MARIADB_DATABASE: redcap
+    command:
+      - --max_allowed_packet=1G
+      - --optimizer_switch=rowid_filter=OFF
+      - --query_cache_size=16777216
+      - --query_cache_limit=16777216
+      - --query_cache_type=1
+      - --innodb_buffer_pool_size=100M
+    ports:
+      - 3306:3306
+
+volumes:
+  mysql:
