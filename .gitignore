@@ -1,3 +1,4 @@
-redcap.sql
+*.sql
 redcap/**
 .env
+redcap*.zip

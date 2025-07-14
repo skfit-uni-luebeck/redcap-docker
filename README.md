@@ -14,10 +14,29 @@ Change the values, so that they fit your setup. The `DATABASE_SALT` has to be a 
 
 2. PHP Sendmail setup
 
-REDCap sends emails using PHP Sendmail. To configure sendmail, add the sendmail parameters to the `email.ini` file.
-The parameters must follow the scheme of busybox sendmail.
+REDCap sends emails using PHP Sendmail. PHP is configured to use msmtp for sending emails. Enter your email credentials in the msmtprc file.
 
-3. Starting containers
+3. Unpacking
+
+Unpack the REDCap archive `redcap*.zip` in the location of this git repository (e.g. using `unzip redcap*.zip`).
+
+4. Setting permissions
+
+PHP runs with ther UID 82. Give PHP write access to folders for user upload, modules and temp:
+
+```
+chmod -R 700 edocs
+chmod -R 700 redcap/edocs
+chmod -R 700 redcap/temp
+chmod -R 700 redcap/modules
+chown 82:82 redcap
+chown -R 82:82 edocs
+chown -R 82:82 redcap/edocs
+chown -R 82:82 redcap/temp
+chown -R 82:82 redcap/modules
+```
+
+5. Starting containers
 
 Start REDCap using
 
@@ -32,14 +51,12 @@ Continue the setup in the browser on the port that you defined in the `.env` fil
 When the initial setup form is completed, you'll get an SQL-file for initialization. Save that script to your computer and load the SQL file.
 
 ```
-docker exec -it redcap-mysql mariadb -u redcap -predcap123 redcap < redcap.sql
+docker exec -i redcap-mysql mariadb -u redcap -predcap123 redcap < redcap.sql
 ```
 Replace `redcap123` with your database password.
 
 ### After setup
 
 1. Head to the Control Center and then to Configuration Check.
-There might be some issues with write-permissions to temp and modules directories.
-Fix those by setting permissions using chmod.
 
 2. By default the user-uploaded documents folder is in a place that can be accessed by nginx. This is a security risk and should be changed. This docker setup is supposed to have this set to `/var/www/edocs`. Set this value in File Upload Settings at Local Server File Storage and hit save.

@@ -7,10 +7,11 @@ services:
       DATABASE_USER: redcap
       DATABASE_DATABASE: redcap
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-redcap123}
-      DATABASE_SALT: ${DATABASE_SALT:-}e35399f8f5499516c4ae52dbcc473969c929754b65a30a75db547ec676f9fbcab8345396d6ba701d5cdf2421858be3bb99e9}
+      DATABASE_SALT: ${DATABASE_SALT:-e35399f8f5499516c4ae52dbcc473969c929754b65a30a75db547ec676f9fbcab8345396d6ba701d5cdf2421858be3bb99e9}
     volumes:
       - ./redcap/:/var/www/html/:z
       - ./email.ini:/usr/local/etc/php/conf.d/email.ini:z
+      - ./msmtprc:/etc/msmtprc:z
       - ./edocs:/var/www/edocs:z
     depends_on:
       - db
@@ -26,7 +27,7 @@ services:
       DATABASE_SALT: ${DATABASE_SALT:-e35399f8f5499516c4ae52dbcc473969c929754b65a30a75db547ec676f9fbcab8345396d6ba701d5cdf2421858be3bb99e9}
     volumes:
       - ./redcap/:/var/www/html/:z
-      - ./email.ini:/usr/local/etc/php/conf.d/email.ini:z
+      - ./php.ini:/usr/local/etc/php/conf.d/redcap.ini:z
       - ./edocs:/var/www/edocs:z
     depends_on:
       - php
@@ -61,8 +62,6 @@ services:
       - --query_cache_limit=16777216
       - --query_cache_type=1
       - --innodb_buffer_pool_size=100M
-    ports:
-      - 3306:3306
 
 volumes:
   mysql:
