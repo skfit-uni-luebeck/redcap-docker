@@ -2,23 +2,7 @@ services:
   php:
     build: ./services/php/
     container_name: redcap-php
-    environment:
-      DATABASE_HOST: db
-      DATABASE_USER: redcap
-      DATABASE_DATABASE: redcap
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-redcap123}
-      DATABASE_SALT: ${DATABASE_SALT:-e35399f8f5499516c4ae52dbcc473969c929754b65a30a75db547ec676f9fbcab8345396d6ba701d5cdf2421858be3bb99e9}
-    volumes:
-      - ./redcap/:/var/www/html/:z
-      - ./email.ini:/usr/local/etc/php/conf.d/email.ini:z
-      - ./msmtprc:/etc/msmtprc:z
-      - ./edocs:/var/www/edocs:z
-    depends_on:
-      - db
-
-  cron:
-    build: ./services/php/
-    container_name: redcap-cron
+    pull_policy: ${PULL_POLICY:-always}
     environment:
       DATABASE_HOST: db
       DATABASE_USER: redcap
@@ -28,6 +12,25 @@ services:
     volumes:
       - ./redcap/:/var/www/html/:z
       - ./php.ini:/usr/local/etc/php/conf.d/redcap.ini:z
+      - ./msmtprc:/etc/msmtprc:z
+      - ./edocs:/var/www/edocs:z
+    depends_on:
+      - db
+
+  cron:
+    build: ./services/php/
+    container_name: redcap-cron
+    pull_policy: ${PULL_POLICY:-always}
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: redcap
+      DATABASE_DATABASE: redcap
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-redcap123}
+      DATABASE_SALT: ${DATABASE_SALT:-e35399f8f5499516c4ae52dbcc473969c929754b65a30a75db547ec676f9fbcab8345396d6ba701d5cdf2421858be3bb99e9}
+    volumes:
+      - ./redcap/:/var/www/html/:z
+      - ./php.ini:/usr/local/etc/php/conf.d/redcap.ini:z
+      - ./msmtprc:/etc/msmtprc:z
       - ./edocs:/var/www/edocs:z
     depends_on:
       - php
@@ -37,6 +40,7 @@ services:
 
   nginx:
     build: ./services/nginx
+    pull_policy: ${PULL_POLICY:-always}
     container_name: redcap-nginx
     ports:
       - ${HTTP_PORT:-8080}:80
@@ -46,7 +50,8 @@ services:
       - php
 
   db:
-    image: docker.io/mariadb:11.5.2
+    image: docker.io/mariadb:11.8
+    pull_policy: ${PULL_POLICY:-always}
     container_name: redcap-mysql
     volumes:
       - mysql:/var/lib/mysql
