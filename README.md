@@ -46,7 +46,7 @@ docker-compose up -d
 
 Continue the setup in the browser on the port that you defined in the `.env` file.
 
-# Initialize REDCap Database
+### Initialize REDCap Database
 
 When the initial setup form is completed, you'll get an SQL-file for initialization. Save that script to your computer and load the SQL file.
 
@@ -55,8 +55,20 @@ docker exec -i redcap-mysql mariadb -u redcap -predcap123 redcap < redcap.sql
 ```
 Replace `redcap123` with your database password.
 
-### After setup
+## After setup
 
 1. Head to the Control Center and then to Configuration Check.
 
 2. By default the user-uploaded documents folder is in a place that can be accessed by nginx. This is a security risk and should be changed. This docker setup is supposed to have this set to `/var/www/edocs`. Set this value in File Upload Settings at Local Server File Storage and hit save.
+
+## Container Updates
+
+Containers can be easily updated using the included `update.sh` script.
+If the PHP version is updated to a new major version, please make sure that the new major version is also linked in the `update.sh` script.
+
+The script can also be added to the system crontab using:
+```
+0 3 * * * root /opt/redcap/update.sh
+```
+
+This example will run the update script at 3am every day.
