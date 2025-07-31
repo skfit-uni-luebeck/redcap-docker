@@ -1,4 +1,4 @@
-FROM docker.io/php:8.3.12-fpm-alpine
+FROM docker.io/php:8.3-fpm-alpine
 
 # https://github.com/Imagick/imagick/issues/643
 RUN apk add --no-cache --virtual .build-deps \
