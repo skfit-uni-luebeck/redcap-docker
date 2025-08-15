@@ -1,4 +1,4 @@
-FROM docker.io/php:8.3-fpm-alpine
+FROM docker.io/php:8.4-fpm-alpine
 
 # https://github.com/Imagick/imagick/issues/643
 RUN apk add --no-cache --virtual .build-deps \
@@ -7,7 +7,7 @@ RUN apk add --no-cache libzip-dev zlib-dev libpng-dev imagemagick imagemagick-pd
 RUN curl -L -o /tmp/imagick.tar.gz https://github.com/Imagick/imagick/archive/7088edc353f53c4bc644573a79cdcd67a726ae16.tar.gz \
     && tar --strip-components=1 -xf /tmp/imagick.tar.gz \
     && phpize \
-    && ./configure \
+    && ./configure CPPFLAGS='-Dphp_strtolower=zend_str_tolower' \
     && make \
     && make install \
     && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini \
