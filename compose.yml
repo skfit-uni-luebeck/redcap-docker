@@ -1,8 +1,8 @@
 services:
   php:
     build: ./services/php/
+    image: redcap-php
     container_name: redcap-php
-    pull_policy: ${PULL_POLICY:-always}
     environment:
       DATABASE_HOST: db
       DATABASE_USER: redcap
@@ -16,11 +16,12 @@ services:
       - ./edocs:/var/www/edocs:z
     depends_on:
       - db
+    restart: unless-stopped
 
   cron:
     build: ./services/php/
+    image: redcap-php
     container_name: redcap-cron
-    pull_policy: ${PULL_POLICY:-always}
     environment:
       DATABASE_HOST: db
       DATABASE_USER: redcap
@@ -37,6 +38,7 @@ services:
     command:
       - "crond"
       - "-f"
+    restart: unless-stopped
 
   nginx:
     build: ./services/nginx
@@ -48,6 +50,7 @@ services:
       - ./redcap/:/var/www/html/:z
     depends_on:
       - php
+    restart: unless-stopped
 
   db:
     image: docker.io/mariadb:11.8
@@ -73,6 +76,7 @@ services:
       - --sync_binlog=0
       - --max_heap_table_size=8M
       - --tmp_table_size=8M
+    restart: unless-stopped
 
 volumes:
   mysql:
