@@ -2,3 +2,8 @@
 redcap/**
 .env
 redcap*.zip
+compose.override.yml
+*.pem
+*.tar
+medic-nginx.conf
+msmtprc-uksh
